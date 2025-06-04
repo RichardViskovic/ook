@@ -19,6 +19,10 @@
     socket.on('newText', text => {
       display.textContent = text;
     });
+
+    socket.on('scroll', pos => {
+      window.scrollTo(0, pos);
+    });
   </script>
 </body>
 </html>

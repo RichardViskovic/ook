@@ -10,7 +10,7 @@
     <h1>Teacher Console</h1>
     <input type="file" id="fileInput" accept=".txt">
     <hr>
-    <textarea id="editor" rows="10" cols="60"></textarea><br>
+    <pre id="editor" contenteditable="true"></pre>
   </div>
 
   <script src="/socket.io/socket.io.js"></script>
@@ -31,13 +31,17 @@
         });
     });
 
-      editor.addEventListener("input", () => {
-        socket.emit("editText", editor.value);
-      });
+    editor.addEventListener('input', () => {
+      socket.emit('editText', editor.textContent);
+    });
+
+    window.addEventListener('scroll', () => {
+      socket.emit('scroll', window.pageYOffset || document.documentElement.scrollTop);
+    });
 
     // Show incoming text in the editor for reference
     socket.on('newText', text => {
-      editor.value = text;
+      editor.textContent = text;
     });
   </script>
 </body>
