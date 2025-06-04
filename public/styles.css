@@ -57,6 +57,19 @@ pre#editor {
   font-size: 1.2em;
 }
 
+.editor-wrapper {
+  position: relative;
+}
+
+.highlight-overlay {
+  position: absolute;
+  left: 0;
+  right: 0;
+  background: yellow;
+  opacity: 0.4;
+  pointer-events: none;
+}
+
 .hamburger {
   position: fixed;
   top: 10px;
