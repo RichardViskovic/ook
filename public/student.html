@@ -1,0 +1,19 @@
+<!DOCTYPE html>
+<html>
+<head><meta charset="utf-8"><title>Student Reader</title></head>
+<body>
+  <h1>Book Reader</h1>
+  <pre id="display" style="white-space: pre-wrap; border:1px solid #ccc; padding:10px;"></pre>
+
+  <script src="/socket.io/socket.io.js"></script>
+  <script>
+    const socket = io();
+    const display = document.getElementById('display');
+
+    socket.on('newText', text => {
+      display.textContent = text;
+    });
+  </script>
+</body>
+</html>
+

@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html>
+<head><meta charset="utf-8"><title>Teacher Console</title></head>
+<body>
+  <h1>Teacher Console</h1>
+  <input type="file" id="fileInput" accept=".txt">
+  <button id="uploadBtn">Upload to Students</button>
+  <hr>
+  <textarea id="editor" rows="10" cols="60"></textarea><br>
+  <button id="sendEdit">Send Edit</button>
+
+  <script src="/socket.io/socket.io.js"></script>
+  <script>
+    const socket = io();
+    const fileInput = document.getElementById('fileInput');
+    const uploadBtn = document.getElementById('uploadBtn');
+    const editor = document.getElementById('editor');
+    const sendEdit = document.getElementById('sendEdit');
+
+    uploadBtn.addEventListener('click', () => {
+      const file = fileInput.files[0];
+      if (!file) return alert('Choose a .txt file first');
+      const form = new FormData();
+      form.append('bookfile', file);
+      fetch('/upload', { method: 'POST', body: form })
+        .then(res => {
+          if (res.ok) alert('Uploaded successfully');
+          else alert('Upload failed');
+        });
+    });
+
+    sendEdit.addEventListener('click', () => {
+      socket.emit('editText', editor.value);
+    });
+
+    // Show incoming text in the editor for reference
+    socket.on('newText', text => {
+      editor.value = text;
+    });
+  </script>
+</body>
+</html>
+
