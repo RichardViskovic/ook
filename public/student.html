@@ -8,16 +8,29 @@
 <body>
   <div class="container">
     <h1>Book Reader</h1>
-    <pre id="display"></pre>
+    <div id="displayWrapper" class="editor-wrapper">
+      <pre id="display"></pre>
+      <div id="highlight" class="highlight-overlay" style="display:none;"></div>
+    </div>
   </div>
 
   <script src="/socket.io/socket.io.js"></script>
   <script>
     const socket = io();
     const display = document.getElementById('display');
+    const highlight = document.getElementById('highlight');
+    let highlightActive = false;
+    let currentLine = 0;
+
+    function updateHighlight() {
+      const lineHeight = parseFloat(getComputedStyle(display).lineHeight);
+      highlight.style.height = lineHeight + 'px';
+      highlight.style.top = (currentLine * lineHeight - (window.pageYOffset || document.documentElement.scrollTop)) + 'px';
+    }
 
     socket.on('newText', text => {
       display.textContent = text;
+      updateHighlight();
     });
 
     socket.on('scroll', pos => {
@@ -26,6 +39,23 @@
 
     socket.on('fontSize', size => {
       display.style.fontSize = size + 'px';
+      updateHighlight();
+    });
+
+    socket.on('highlightToggle', data => {
+      highlightActive = data.active;
+      currentLine = data.line;
+      highlight.style.display = highlightActive ? 'block' : 'none';
+      updateHighlight();
+    });
+
+    socket.on('highlightMove', line => {
+      currentLine = line;
+      updateHighlight();
+    });
+
+    window.addEventListener('scroll', () => {
+      if (highlightActive) updateHighlight();
     });
   </script>
 </body>

@@ -37,6 +37,14 @@ io.on('connection', socket => {
   socket.on('fontSize', size => {
     io.emit('fontSize', size);
   });
+
+  socket.on('highlightToggle', data => {
+    io.emit('highlightToggle', data);
+  });
+
+  socket.on('highlightMove', line => {
+    io.emit('highlightMove', line);
+  });
 });
 
 const PORT = process.env.PORT || 3000;
