@@ -33,21 +33,24 @@
     const incBtn = document.getElementById('fontIncrease');
     const decBtn = document.getElementById('fontDecrease');
     const highlight = document.getElementById('highlight');
+    const wrapper = document.getElementById('editorWrapper');
     let highlightActive = false;
     let currentLine = 0;
     let fontSize = parseFloat(getComputedStyle(editor).fontSize);
 
     function updateHighlight() {
       const lineHeight = parseFloat(getComputedStyle(editor).lineHeight);
+      const offsetTop = wrapper.getBoundingClientRect().top + (window.pageYOffset || document.documentElement.scrollTop);
       highlight.style.height = lineHeight + 'px';
-      highlight.style.top = (currentLine * lineHeight - (window.pageYOffset || document.documentElement.scrollTop)) + 'px';
+      highlight.style.top = (currentLine * lineHeight + offsetTop - (window.pageYOffset || document.documentElement.scrollTop)) + 'px';
     }
 
     function toggleHighlight() {
       highlightActive = !highlightActive;
       highlight.style.display = highlightActive ? 'block' : 'none';
       const lineHeight = parseFloat(getComputedStyle(editor).lineHeight);
-      currentLine = Math.floor((window.pageYOffset || document.documentElement.scrollTop) / lineHeight);
+      const offsetTop = wrapper.getBoundingClientRect().top + (window.pageYOffset || document.documentElement.scrollTop);
+      currentLine = Math.floor(((window.pageYOffset || document.documentElement.scrollTop) - offsetTop) / lineHeight);
       updateHighlight();
       socket.emit('highlightToggle', { active: highlightActive, line: currentLine });
     }
@@ -56,10 +59,12 @@
       if (!highlightActive) return;
       currentLine = Math.max(0, currentLine + delta);
       const lineHeight = parseFloat(getComputedStyle(editor).lineHeight);
-      if ((currentLine + 1) * lineHeight > (window.pageYOffset || document.documentElement.scrollTop) + window.innerHeight) {
-        window.scrollTo(0, currentLine * lineHeight);
-      } else if (currentLine * lineHeight < (window.pageYOffset || document.documentElement.scrollTop)) {
-        window.scrollTo(0, currentLine * lineHeight);
+      const offsetTop = wrapper.getBoundingClientRect().top + (window.pageYOffset || document.documentElement.scrollTop);
+      const highlightTop = currentLine * lineHeight + offsetTop;
+      if (highlightTop + lineHeight > (window.pageYOffset || document.documentElement.scrollTop) + window.innerHeight) {
+        window.scrollTo(0, highlightTop + lineHeight - window.innerHeight);
+      } else if (highlightTop < (window.pageYOffset || document.documentElement.scrollTop)) {
+        window.scrollTo(0, highlightTop);
       }
       updateHighlight();
       socket.emit('highlightMove', currentLine);
