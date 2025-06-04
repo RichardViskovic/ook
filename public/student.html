@@ -19,13 +19,15 @@
     const socket = io();
     const display = document.getElementById('display');
     const highlight = document.getElementById('highlight');
+    const wrapper = document.getElementById('displayWrapper');
     let highlightActive = false;
     let currentLine = 0;
 
     function updateHighlight() {
       const lineHeight = parseFloat(getComputedStyle(display).lineHeight);
+      const offsetTop = wrapper.getBoundingClientRect().top + (window.pageYOffset || document.documentElement.scrollTop);
       highlight.style.height = lineHeight + 'px';
-      highlight.style.top = (currentLine * lineHeight - (window.pageYOffset || document.documentElement.scrollTop)) + 'px';
+      highlight.style.top = (currentLine * lineHeight + offsetTop - (window.pageYOffset || document.documentElement.scrollTop)) + 'px';
     }
 
     socket.on('newText', text => {
