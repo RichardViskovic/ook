@@ -12,7 +12,6 @@
     <button id="uploadBtn">Upload to Students</button>
     <hr>
     <textarea id="editor" rows="10" cols="60"></textarea><br>
-    <button id="sendEdit">Send Edit</button>
   </div>
 
   <script src="/socket.io/socket.io.js"></script>
@@ -21,7 +20,6 @@
     const fileInput = document.getElementById('fileInput');
     const uploadBtn = document.getElementById('uploadBtn');
     const editor = document.getElementById('editor');
-    const sendEdit = document.getElementById('sendEdit');
 
     uploadBtn.addEventListener('click', () => {
       const file = fileInput.files[0];
@@ -35,9 +33,9 @@
         });
     });
 
-    sendEdit.addEventListener('click', () => {
-      socket.emit('editText', editor.value);
-    });
+      editor.addEventListener("input", () => {
+        socket.emit("editText", editor.value);
+      });
 
     // Show incoming text in the editor for reference
     socket.on('newText', text => {
