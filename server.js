@@ -33,6 +33,10 @@ io.on('connection', socket => {
   socket.on('scroll', pos => {
     socket.broadcast.emit('scroll', pos);
   });
+
+  socket.on('fontSize', size => {
+    io.emit('fontSize', size);
+  });
 });
 
 const PORT = process.env.PORT || 3000;
