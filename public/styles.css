@@ -62,9 +62,26 @@ pre#editor {
   top: 10px;
   right: 10px;
   font-size: 24px;
-  background: none;
+  background-color: #007bff;
+  color: white;
   border: none;
+  padding: 8px 12px;
+  border-radius: 4px;
   cursor: pointer;
+  z-index: 1000;
+}
+
+.close-btn {
+  background-color: #dc3545;
+  color: white;
+  border: none;
+  padding: 4px 8px;
+  border-radius: 4px;
+  cursor: pointer;
+  float: right;
+  width: auto;
+  display: inline-block;
+  margin-bottom: 10px;
 }
 
 .menu {
