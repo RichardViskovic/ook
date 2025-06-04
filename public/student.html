@@ -23,6 +23,10 @@
     socket.on('scroll', pos => {
       window.scrollTo(0, pos);
     });
+
+    socket.on('fontSize', size => {
+      display.style.fontSize = size + 'px';
+    });
   </script>
 </body>
 </html>
