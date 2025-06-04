@@ -1,13 +1,19 @@
 <!DOCTYPE html>
 <html>
-<head><meta charset="utf-8"><title>Teacher Console</title></head>
+<head>
+  <meta charset="utf-8">
+  <title>Teacher Console</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
 <body>
-  <h1>Teacher Console</h1>
-  <input type="file" id="fileInput" accept=".txt">
-  <button id="uploadBtn">Upload to Students</button>
-  <hr>
-  <textarea id="editor" rows="10" cols="60"></textarea><br>
-  <button id="sendEdit">Send Edit</button>
+  <div class="container">
+    <h1>Teacher Console</h1>
+    <input type="file" id="fileInput" accept=".txt">
+    <button id="uploadBtn">Upload to Students</button>
+    <hr>
+    <textarea id="editor" rows="10" cols="60"></textarea><br>
+    <button id="sendEdit">Send Edit</button>
+  </div>
 
   <script src="/socket.io/socket.io.js"></script>
   <script>
