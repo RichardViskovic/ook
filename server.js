@@ -29,6 +29,10 @@ io.on('connection', socket => {
   socket.on('editText', newText => {
     io.emit('newText', newText);
   });
+
+  socket.on('scroll', pos => {
+    socket.broadcast.emit('scroll', pos);
+  });
 });
 
 const PORT = process.env.PORT || 3000;
