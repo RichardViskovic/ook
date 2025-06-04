@@ -9,7 +9,6 @@
   <div class="container">
     <h1>Teacher Console</h1>
     <input type="file" id="fileInput" accept=".txt">
-    <button id="uploadBtn">Upload to Students</button>
     <hr>
     <textarea id="editor" rows="10" cols="60"></textarea><br>
   </div>
@@ -18,12 +17,11 @@
   <script>
     const socket = io();
     const fileInput = document.getElementById('fileInput');
-    const uploadBtn = document.getElementById('uploadBtn');
     const editor = document.getElementById('editor');
 
-    uploadBtn.addEventListener('click', () => {
+    fileInput.addEventListener('change', () => {
       const file = fileInput.files[0];
-      if (!file) return alert('Choose a .txt file first');
+      if (!file) return;
       const form = new FormData();
       form.append('bookfile', file);
       fetch('/upload', { method: 'POST', body: form })
