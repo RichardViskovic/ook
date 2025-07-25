@@ -25,9 +25,8 @@
 
     function updateHighlight() {
       const lineHeight = parseFloat(getComputedStyle(display).lineHeight);
-      const offsetTop = wrapper.getBoundingClientRect().top + (window.pageYOffset || document.documentElement.scrollTop);
       highlight.style.height = lineHeight + 'px';
-      highlight.style.top = (currentLine * lineHeight + offsetTop - (window.pageYOffset || document.documentElement.scrollTop)) + 'px';
+      highlight.style.top = (currentLine * lineHeight) + 'px';
     }
 
     socket.on('newText', text => {
@@ -56,9 +55,6 @@
       updateHighlight();
     });
 
-    window.addEventListener('scroll', () => {
-      if (highlightActive) updateHighlight();
-    });
   </script>
 </body>
 </html>
