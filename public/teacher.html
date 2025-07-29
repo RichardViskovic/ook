@@ -18,7 +18,6 @@
     <h1>Teacher Console</h1>
     <div id="editorWrapper" class="editor-wrapper">
       <pre id="editor" contenteditable="true"></pre>
-      <div id="highlight" class="highlight-overlay" style="display:none;"></div>
     </div>
   </div>
 
@@ -32,21 +31,25 @@
     const menuClose = document.getElementById('menuClose');
     const incBtn = document.getElementById('fontIncrease');
     const decBtn = document.getElementById('fontDecrease');
-    const highlight = document.getElementById('highlight');
     const wrapper = document.getElementById('editorWrapper');
     let highlightActive = false;
     let currentLine = 0;
     let fontSize = parseFloat(getComputedStyle(editor).fontSize);
 
+    function renderText(text) {
+      const lines = text.split('\n');
+      editor.innerHTML = lines.map(l => `<span class="line">${l}</span>`).join('');
+    }
+
     function updateHighlight() {
-      const lineHeight = parseFloat(getComputedStyle(editor).lineHeight);
-      highlight.style.height = lineHeight + 'px';
-      highlight.style.top = (currentLine * lineHeight) + 'px';
+      const lines = editor.querySelectorAll('.line');
+      lines.forEach((line, idx) => {
+        line.classList.toggle('highlight-line', highlightActive && idx === currentLine);
+      });
     }
 
     function toggleHighlight() {
       highlightActive = !highlightActive;
-      highlight.style.display = highlightActive ? 'block' : 'none';
       const lineHeight = parseFloat(getComputedStyle(editor).lineHeight);
       const offsetTop = wrapper.getBoundingClientRect().top + (window.pageYOffset || document.documentElement.scrollTop);
       currentLine = Math.floor(((window.pageYOffset || document.documentElement.scrollTop) - offsetTop) / lineHeight);
@@ -133,14 +136,13 @@
 
     // Show incoming text in the editor for reference
     socket.on('newText', text => {
-      editor.textContent = text;
+      renderText(text);
       updateHighlight();
     });
 
     socket.on('highlightToggle', data => {
       highlightActive = data.active;
       currentLine = data.line;
-      highlight.style.display = highlightActive ? 'block' : 'none';
       updateHighlight();
     });
 

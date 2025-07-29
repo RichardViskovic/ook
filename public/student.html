@@ -10,7 +10,6 @@
     <h1>Book Reader</h1>
     <div id="displayWrapper" class="editor-wrapper">
       <pre id="display"></pre>
-      <div id="highlight" class="highlight-overlay" style="display:none;"></div>
     </div>
   </div>
 
@@ -18,19 +17,24 @@
   <script>
     const socket = io();
     const display = document.getElementById('display');
-    const highlight = document.getElementById('highlight');
     const wrapper = document.getElementById('displayWrapper');
     let highlightActive = false;
     let currentLine = 0;
 
+    function renderText(text) {
+      const lines = text.split('\n');
+      display.innerHTML = lines.map(l => `<span class="line">${l}</span>`).join('');
+    }
+
     function updateHighlight() {
-      const lineHeight = parseFloat(getComputedStyle(display).lineHeight);
-      highlight.style.height = lineHeight + 'px';
-      highlight.style.top = (currentLine * lineHeight) + 'px';
+      const lines = display.querySelectorAll('.line');
+      lines.forEach((line, idx) => {
+        line.classList.toggle('highlight-line', highlightActive && idx === currentLine);
+      });
     }
 
     socket.on('newText', text => {
-      display.textContent = text;
+      renderText(text);
       updateHighlight();
     });
 
@@ -46,7 +50,6 @@
     socket.on('highlightToggle', data => {
       highlightActive = data.active;
       currentLine = data.line;
-      highlight.style.display = highlightActive ? 'block' : 'none';
       updateHighlight();
     });
 

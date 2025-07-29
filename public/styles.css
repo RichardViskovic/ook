@@ -63,13 +63,15 @@ pre#editor {
   position: relative;
 }
 
-.highlight-overlay {
-  position: absolute;
-  left: 0;
-  right: 0;
+
+.line {
+  display: block;
+  white-space: pre-wrap;
+}
+
+.line.highlight-line {
   background: yellow;
   opacity: 0.4;
-  pointer-events: none;
 }
 
 .hamburger {
