@@ -36,8 +36,23 @@
     let currentLine = 0;
     let fontSize = parseFloat(getComputedStyle(editor).fontSize);
 
+    function breakIntoLines(text, maxChars) {
+      const out = [];
+      text.split('\n').forEach(line => {
+        if (line === '') { out.push(''); return; }
+        while (line.length > maxChars) {
+          out.push(line.slice(0, maxChars));
+          line = line.slice(maxChars);
+        }
+        out.push(line);
+      });
+      return out;
+    }
+
     function renderText(text) {
-      const lines = text.split('\n');
+      const charWidth = parseFloat(getComputedStyle(editor).fontSize) * 0.6;
+      const maxChars = Math.max(1, Math.floor(editor.clientWidth / charWidth));
+      const lines = breakIntoLines(text, maxChars);
       editor.innerHTML = lines.map(l => `<span class="line">${l}</span>`).join('');
     }
 
@@ -48,18 +63,8 @@
       });
     }
 
-    function toggleHighlight() {
-      highlightActive = !highlightActive;
-      const lineHeight = parseFloat(getComputedStyle(editor).lineHeight);
-      const offsetTop = wrapper.getBoundingClientRect().top + (window.pageYOffset || document.documentElement.scrollTop);
-      currentLine = Math.floor(((window.pageYOffset || document.documentElement.scrollTop) - offsetTop) / lineHeight);
-      updateHighlight();
-      socket.emit('highlightToggle', { active: highlightActive, line: currentLine });
-    }
-
-    function moveHighlight(delta) {
+    function ensureHighlightInView() {
       if (!highlightActive) return;
-      currentLine = Math.max(0, currentLine + delta);
       const lineHeight = parseFloat(getComputedStyle(editor).lineHeight);
       const offsetTop = wrapper.getBoundingClientRect().top + (window.pageYOffset || document.documentElement.scrollTop);
       const highlightTop = currentLine * lineHeight + offsetTop;
@@ -68,7 +73,23 @@
       } else if (highlightTop < (window.pageYOffset || document.documentElement.scrollTop)) {
         window.scrollTo(0, highlightTop);
       }
+    }
+
+    function toggleHighlight() {
+      highlightActive = !highlightActive;
+      const lineHeight = parseFloat(getComputedStyle(editor).lineHeight);
+      const offsetTop = wrapper.getBoundingClientRect().top + (window.pageYOffset || document.documentElement.scrollTop);
+      currentLine = Math.floor(((window.pageYOffset || document.documentElement.scrollTop) - offsetTop) / lineHeight);
       updateHighlight();
+      ensureHighlightInView();
+      socket.emit('highlightToggle', { active: highlightActive, line: currentLine });
+    }
+
+    function moveHighlight(delta) {
+      if (!highlightActive) return;
+      currentLine = Math.max(0, currentLine + delta);
+      updateHighlight();
+      ensureHighlightInView();
       socket.emit('highlightMove', currentLine);
     }
 
@@ -112,6 +133,7 @@
       fontSize = size;
       editor.style.fontSize = size + 'px';
       updateHighlight();
+      ensureHighlightInView();
     });
 
     fileInput.addEventListener('change', () => {
@@ -138,17 +160,20 @@
     socket.on('newText', text => {
       renderText(text);
       updateHighlight();
+      ensureHighlightInView();
     });
 
     socket.on('highlightToggle', data => {
       highlightActive = data.active;
       currentLine = data.line;
       updateHighlight();
+      ensureHighlightInView();
     });
 
     socket.on('highlightMove', line => {
       currentLine = line;
       updateHighlight();
+      ensureHighlightInView();
     });
   </script>
 </body>
