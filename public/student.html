@@ -53,11 +53,10 @@
       const lineHeight = parseFloat(getComputedStyle(display).lineHeight);
       const offsetTop = wrapper.getBoundingClientRect().top + (window.pageYOffset || document.documentElement.scrollTop);
       const highlightTop = currentLine * lineHeight + offsetTop;
-      if (highlightTop + lineHeight > (window.pageYOffset || document.documentElement.scrollTop) + window.innerHeight) {
-        window.scrollTo(0, highlightTop + lineHeight - window.innerHeight);
-      } else if (highlightTop < (window.pageYOffset || document.documentElement.scrollTop)) {
-        window.scrollTo(0, highlightTop);
-      }
+      const target = highlightTop - (window.innerHeight / 2) + (lineHeight / 2);
+      const maxScroll = document.documentElement.scrollHeight - window.innerHeight;
+      const newScroll = Math.max(0, Math.min(target, maxScroll));
+      window.scrollTo(0, newScroll);
     }
 
     socket.on('newText', text => {
