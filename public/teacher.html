@@ -51,7 +51,7 @@
 
     function renderText(text) {
       const charWidth = parseFloat(getComputedStyle(editor).fontSize) * 0.6;
-      const maxChars = Math.max(1, Math.floor(editor.clientWidth / charWidth));
+      const maxChars = Math.max(1, Math.floor(editor.clientWidth / charWidth) - 2);
       const lines = breakIntoLines(text, maxChars);
       editor.innerHTML = lines.map(l => `<span class="line">${l}</span>`).join('');
     }
@@ -80,6 +80,8 @@
       const lineHeight = parseFloat(getComputedStyle(editor).lineHeight);
       const offsetTop = wrapper.getBoundingClientRect().top + (window.pageYOffset || document.documentElement.scrollTop);
       currentLine = Math.floor(((window.pageYOffset || document.documentElement.scrollTop) - offsetTop) / lineHeight);
+      const totalLines = editor.querySelectorAll('.line').length;
+      currentLine = Math.max(0, Math.min(currentLine, totalLines - 1));
       updateHighlight();
       ensureHighlightInView();
       socket.emit('highlightToggle', { active: highlightActive, line: currentLine });
@@ -87,7 +89,8 @@
 
     function moveHighlight(delta) {
       if (!highlightActive) return;
-      currentLine = Math.max(0, currentLine + delta);
+      const totalLines = editor.querySelectorAll('.line').length;
+      currentLine = Math.max(0, Math.min(currentLine + delta, totalLines - 1));
       updateHighlight();
       ensureHighlightInView();
       socket.emit('highlightMove', currentLine);
@@ -165,13 +168,15 @@
 
     socket.on('highlightToggle', data => {
       highlightActive = data.active;
-      currentLine = data.line;
+      const totalLines = editor.querySelectorAll('.line').length;
+      currentLine = Math.max(0, Math.min(data.line, totalLines - 1));
       updateHighlight();
       ensureHighlightInView();
     });
 
     socket.on('highlightMove', line => {
-      currentLine = line;
+      const totalLines = editor.querySelectorAll('.line').length;
+      currentLine = Math.max(0, Math.min(line, totalLines - 1));
       updateHighlight();
       ensureHighlightInView();
     });

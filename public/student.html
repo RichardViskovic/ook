@@ -36,7 +36,7 @@
 
     function renderText(text) {
       const charWidth = parseFloat(getComputedStyle(display).fontSize) * 0.6;
-      const maxChars = Math.max(1, Math.floor(display.clientWidth / charWidth));
+      const maxChars = Math.max(1, Math.floor(display.clientWidth / charWidth) - 2);
       const lines = breakIntoLines(text, maxChars);
       display.innerHTML = lines.map(l => `<span class="line">${l}</span>`).join('');
     }
@@ -78,13 +78,15 @@
 
     socket.on('highlightToggle', data => {
       highlightActive = data.active;
-      currentLine = data.line;
+      const totalLines = display.querySelectorAll('.line').length;
+      currentLine = Math.max(0, Math.min(data.line, totalLines - 1));
       updateHighlight();
       ensureHighlightInView();
     });
 
     socket.on('highlightMove', line => {
-      currentLine = line;
+      const totalLines = display.querySelectorAll('.line').length;
+      currentLine = Math.max(0, Math.min(line, totalLines - 1));
       updateHighlight();
       ensureHighlightInView();
     });
