@@ -21,8 +21,23 @@
     let highlightActive = false;
     let currentLine = 0;
 
+    function breakIntoLines(text, maxChars) {
+      const out = [];
+      text.split('\n').forEach(line => {
+        if (line === '') { out.push(''); return; }
+        while (line.length > maxChars) {
+          out.push(line.slice(0, maxChars));
+          line = line.slice(maxChars);
+        }
+        out.push(line);
+      });
+      return out;
+    }
+
     function renderText(text) {
-      const lines = text.split('\n');
+      const charWidth = parseFloat(getComputedStyle(display).fontSize) * 0.6;
+      const maxChars = Math.max(1, Math.floor(display.clientWidth / charWidth));
+      const lines = breakIntoLines(text, maxChars);
       display.innerHTML = lines.map(l => `<span class="line">${l}</span>`).join('');
     }
 
@@ -33,9 +48,22 @@
       });
     }
 
+    function ensureHighlightInView() {
+      if (!highlightActive) return;
+      const lineHeight = parseFloat(getComputedStyle(display).lineHeight);
+      const offsetTop = wrapper.getBoundingClientRect().top + (window.pageYOffset || document.documentElement.scrollTop);
+      const highlightTop = currentLine * lineHeight + offsetTop;
+      if (highlightTop + lineHeight > (window.pageYOffset || document.documentElement.scrollTop) + window.innerHeight) {
+        window.scrollTo(0, highlightTop + lineHeight - window.innerHeight);
+      } else if (highlightTop < (window.pageYOffset || document.documentElement.scrollTop)) {
+        window.scrollTo(0, highlightTop);
+      }
+    }
+
     socket.on('newText', text => {
       renderText(text);
       updateHighlight();
+      ensureHighlightInView();
     });
 
     socket.on('scroll', pos => {
@@ -45,17 +73,20 @@
     socket.on('fontSize', size => {
       display.style.fontSize = size + 'px';
       updateHighlight();
+      ensureHighlightInView();
     });
 
     socket.on('highlightToggle', data => {
       highlightActive = data.active;
       currentLine = data.line;
       updateHighlight();
+      ensureHighlightInView();
     });
 
     socket.on('highlightMove', line => {
       currentLine = line;
       updateHighlight();
+      ensureHighlightInView();
     });
 
   </script>
